@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IDONTWANTTOLOGIN</title>
+</head>
+<body>
+    <h1 id="status">Work Session</h1>
+    <h2 id="sessionDisplay">Session: 1 / 4</h2>
+    <div>
+        <label>Work (min):</label>
+        <input type="number" id="workIn" value="25" min="1">
+        <label>Break (min):</label>
+        <input type="number" id="breakIn" value="5" min="1">
+    </div>
+    <br>
+    <div style="font-size: 2rem; font-weight: bold;">
+        <span id="display">25:00</span>
+    </div>
+    <br>
+    <button id="startBtn" onclick="startTimer()">Start</button>
+    <button id="resetBtn" onclick="resetTimer()">Reset All</button>
+    <audio id="sound" src="bell.mp3" preload="auto"></audio>
+    <script>
+        let timer;
+        let time;
+        let isRunning = false;
+        let currentSession = 1;
+        let isBreak = false;
+        const totalSessions = 4;
+
+        const display = document.getElementById('display');
+        const workIn = document.getElementById('workIn');
+        const breakIn = document.getElementById('breakIn');
+        const statusTxt = document.getElementById('status');
+        const sessionTxt = document.getElementById('sessionDisplay');
+        const sound = document.getElementById('sound');
+
+        function updateDisplay(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            const timeString = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            display.textContent = timeString;
+            document.title = `${isBreak ? 'B':'W'}${timeString}`;
+        }
+        function startTimer() {
+            if (isRunning) return;
+            if (!time) {
+                const mins = isBreak ? parseInt(breakIn.value) : parseInt(workIn.value);
+                time = mins * 60;
+            }
+            isRunning = true;
+            document.getElementById('startBtn').disabled = true;
+            timer = setInterval(() => {
+                time--;
+                updateDisplay(time);
+                if (time <= 0) {
+                    clearInterval(timer);
+                    isRunning = false;
+                    document.getElementById('startBtn').disabled = false;
+                    sound.play();
+                    handlePhaseSwitch();
+                }
+            }, 1000);
+        }
+        function handlePhaseSwitch() {
+            if (!isBreak) {
+                if (currentSession >= totalSessions) {
+                    statusTxt.textContent = "Finished All Sessions!";
+                    document.title = "Done!";
+                    return;
+                }
+                isBreak = true;
+                statusTxt.textContent = "Break Time";
+                time = parseInt(breakIn.value) * 60;
+                alert("Work session over! Start break?");
+            } else {
+                isBreak = false;
+                currentSession++;
+                statusTxt.textContent = "Work Session";
+                sessionTxt.textContent = `Session: ${currentSession} / ${totalSessions}`;
+                time = parseInt(workIn.value) * 60;
+                alert("Break over! Back to work?");
+            }
+            updateDisplay(time);
+            startTimer(); 
+        }
+        function resetTimer() {
+            clearInterval(timer);
+            isRunning = false;
+            currentSession = 1;
+            isBreak = false;
+            time = parseInt(workIn.value) * 60;
+            document.getElementById('startBtn').disabled = false;
+            statusTxt.textContent = "Work Session";
+            sessionTxt.textContent = `Session: 1 / 4`;
+            updateDisplay(time);
+        }
+    </script>
+</body>
+</html>
