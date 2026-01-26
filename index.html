@@ -12,16 +12,20 @@
         <label>Work (min):</label>
         <input type="number" id="workIn" value="25" min="1">
         <label>Break (min):</label>
-        <input type="number" id="breakIn" value="5" min="1">
+        <input type="number" id="breakIn" value="6" min="1">
     </div>
     <br>
     <div style="font-size: 2rem; font-weight: bold;">
         <span id="display">25:00</span>
     </div>
     <br>
+
+    <!-- button -->
     <button id="startBtn" onclick="startTimer()">Start</button>
+    <button id="stopBtn" onclick="stopTimer()" disabled>Stop</button>
     <button id="resetBtn" onclick="resetTimer()">Reset All</button>
     <audio id="sound" src="bell.mp3" preload="auto"></audio>
+
     <script>
         let timer;
         let time;
@@ -36,6 +40,8 @@
         const statusTxt = document.getElementById('status');
         const sessionTxt = document.getElementById('sessionDisplay');
         const sound = document.getElementById('sound');
+        const startBtn = document.getElementById('startBtn');
+        const stopBtn = document.getElementById('stopBtn');
 
         function updateDisplay(seconds) {
             const mins = Math.floor(seconds / 60);
@@ -44,59 +50,111 @@
             display.textContent = timeString;
             document.title = `${isBreak ? 'B':'W'}${timeString}`;
         }
+
         function startTimer() {
             if (isRunning) return;
-            if (!time) {
+            
+            if (time === undefined || time === null) {
                 const mins = isBreak ? parseInt(breakIn.value) : parseInt(workIn.value);
                 time = mins * 60;
+                updateDisplay(time);
             }
+            
             isRunning = true;
-            document.getElementById('startBtn').disabled = true;
+            startBtn.disabled = true;
+            stopBtn.disabled = false;
+            
+            workIn.disabled = true;
+            breakIn.disabled = true;
+            
             timer = setInterval(() => {
                 time--;
                 updateDisplay(time);
+                
                 if (time <= 0) {
                     clearInterval(timer);
                     isRunning = false;
-                    document.getElementById('startBtn').disabled = false;
+                    startBtn.disabled = false;
+                    stopBtn.disabled = true;
                     sound.play();
                     handlePhaseSwitch();
                 }
             }, 1000);
         }
+
+        function stopTimer() {
+            if (!isRunning) return;
+            
+            clearInterval(timer);
+            isRunning = false;
+            startBtn.disabled = false;
+            stopBtn.disabled = true;
+            
+        }
+
         function handlePhaseSwitch() {
             if (!isBreak) {
                 if (currentSession >= totalSessions) {
-                    statusTxt.textContent = "Finished All Sessions!";
-                    document.title = "Done!";
+                    statusTxt.textContent = "Finished All Sessions";
+                    document.title = "Done";
+                    workIn.disabled = false;
+                    breakIn.disabled = false;
+                    time = null;
                     return;
                 }
+                
                 isBreak = true;
                 statusTxt.textContent = "Break Time";
                 time = parseInt(breakIn.value) * 60;
-                alert("Work session over! Start break?");
+                updateDisplay(time);
+                
+                if (confirm("Work session over! Start break?")) {
+                    startTimer();
+                } else {
+                    workIn.disabled = false;
+                    breakIn.disabled = false;
+                }
             } else {
                 isBreak = false;
                 currentSession++;
                 statusTxt.textContent = "Work Session";
                 sessionTxt.textContent = `Session: ${currentSession} / ${totalSessions}`;
                 time = parseInt(workIn.value) * 60;
-                alert("Break over! Back to work?");
+                updateDisplay(time);
+                
+                if (confirm("Break over! Back to work?")) {
+                    startTimer();
+                } else {
+                    workIn.disabled = false;
+                    breakIn.disabled = false;
+                }
             }
-            updateDisplay(time);
-            startTimer(); 
         }
+
         function resetTimer() {
             clearInterval(timer);
             isRunning = false;
             currentSession = 1;
             isBreak = false;
-            time = parseInt(workIn.value) * 60;
-            document.getElementById('startBtn').disabled = false;
+            time = null;
+            
+            startBtn.disabled = false;
+            stopBtn.disabled = true;
+            workIn.disabled = false;
+            breakIn.disabled = false;
+            
             statusTxt.textContent = "Work Session";
             sessionTxt.textContent = `Session: 1 / 4`;
-            updateDisplay(time);
+            document.title = "IDONTWANTTOLOGIN";
+            
+            const mins = parseInt(workIn.value);
+            updateDisplay(mins * 60);
         }
+
+        window.onload = function() {
+            const mins = parseInt(workIn.value);
+            updateDisplay(mins * 60);
+        };
     </script>
 </body>
 </html>
