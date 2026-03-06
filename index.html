@@ -14,9 +14,22 @@
             <div><label>Work (min):</label><input type="number" id="workIn" value="25" min="1"></div>
             <div><label>Break (min):</label><input type="number" id="breakIn" value="5" min="1"></div>
         </div>
-        
+        <div >
+            <div>
+                <p>work: </p>
+                <button onclick="setTimer(25, false)">25 min</button>
+                <button onclick="setTimer(50, false)">50 min</button>
+            </div>
+            <div>
+                <p>break: </p>
+                <button onclick="setTimer(5, true)">5 min</button>
+                <button onclick="setTimer(10, true)">10 min</button>
+            </div>
+        </div>
+
         <div class="timer" style="font-size: 2rem; margin: 20px 0;">
-            <span id="display"></span>
+            <span id="workDisplay">25:00</span>
+            <span id="breakDisplay" style="display:none;">05:00</span>
         </div>
 
         <div class="buttons">
@@ -24,6 +37,11 @@
             <button id="stopBtn" onclick="stopTimer()" disabled>Stop</button>
             <button id="resetBtn" onclick="resetTimer()">Reset All</button>
         </div>
+
+        <div>
+            <button id="skipBtn" onclick="switchSession()">Skip Break</button>
+        </div>
+
         <audio id="sound" src="./bell.mp3" preload="auto"></audio>
     </div>
 
@@ -36,7 +54,8 @@
         const totalSessions = 4;
         let initialTime = 0;
 
-        const display = document.getElementById('display');
+        const workDisplay = document.getElementById('workDisplay');
+        const breakDisplay = document.getElementById('breakDisplay');
         const workIn = document.getElementById('workIn');
         const breakIn = document.getElementById('breakIn');
         const statusTxt = document.getElementById('status');
@@ -45,12 +64,41 @@
         const startBtn = document.getElementById('startBtn');
         const stopBtn = document.getElementById('stopBtn');
 
+        function getActiveDisplay() {
+            if (isBreak) {
+                workDisplay.style.display = 'none';
+                breakDisplay.style.display = 'inline';
+                return breakDisplay;
+            } else {
+                breakDisplay.style.display = 'none';
+                workDisplay.style.display = 'inline';
+                return workDisplay;
+            }
+        }
+
         function updateDisplay(seconds) {
+            const display = getActiveDisplay();
             const mins = Math.floor(seconds / 60);
             const secs = seconds % 60;
             const timeString = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
             display.textContent = timeString;
-            document.title = `${isBreak ? 'Break':'Work'} ${timeString}`;
+            document.title = `${isBreak ? 'Break' : 'Work'} ${timeString}`;
+        }
+
+        function setTimer(min, forBreak) {
+            if (isRunning) return;
+
+            if (forBreak) {
+                breakIn.value = min;
+            } else {
+                workIn.value = min;
+            }
+
+            if (forBreak === isBreak) {
+                time = min * 60;
+                initialTime = time;
+                updateDisplay(time);
+            }
         }
 
         function startTimer() {
@@ -126,6 +174,16 @@
             sessionTxt.textContent = `Session: 1 / 4`;
             updateDisplay(parseInt(workIn.value) * 60);
         }
+
+        function switchSession(){
+            clearInterval(timer);
+            isRunning = false;
+            startBtn.disabled = false;
+            stopBtn.disabled = true;
+            handlePhaseSwitch();
+        }
+
+        updateDisplay(parseInt(workIn.value) * 60);
     </script>
 </body>
 </html>
