@@ -8,8 +8,6 @@
 <body>
     <div class="container" style="margin-top: 50px; text-align: center;">
         <h2 id="sessionDisplay">Session: 1 / 4</h2>
-        <h3 id="status">Work Session</h3>
-        
         <div class="inputs">
             <div><label>Work (min):</label><input type="number" id="workIn" value="25" min="1"></div>
             <div><label>Break (min):</label><input type="number" id="breakIn" value="5" min="1"></div>
@@ -22,7 +20,6 @@
                 <button onclick="setTimer(50, false)">50 min</button>
                 <button onclick="setTimer(60, false)">60 min</button>
             </div>
-            
             <div>
                 <b>Break:</b>
                 <button onclick="setTimer(5, true)">5 min</button>
@@ -30,22 +27,27 @@
                 <button onclick="setTimer(15, true)">15 min</button>
             </div>
         </div>
-
         <div class="timer" style="font-size: 2rem; margin: 20px 0; color: chocolate;">
             <span id="workDisplay">25:00</span>
-            <span id="breakDisplay" style="display:none;">05:00</span>
+            <span id="breakDisplay" style="display: none;">05:00</span>
         </div>
-
+        
         <div class="buttons">
             <button id="startBtn" onclick="startTimer()">Start</button>
-            <button style="background-color:#f44336;" id="stopBtn" onclick="stopTimer()" disabled>Stop</button>
+            <button style="background-color:#f44336; color: white;" id="stopBtn" onclick="stopTimer()" disabled>Stop</button>
             <button id="resetBtn" onclick="resetTimer()">Reset All</button>
         </div>
 
         <div>
             <button id="skipBtn" onclick="switchSession()">Skip Break</button>
         </div>
-
+        <div style="text-align: left; margin: 20px; width: 300px; border: 1px solid black;">
+            <h4 style="text-align: center;">hotkey</h4>
+            <p style="color: grey; margin-left: 5px;">
+            > [spacebar to start/stop time]<br>
+            > [double q to reset all]
+            </p>
+        </div>
         <audio id="sound" src="./bell.mp3" preload="auto"></audio>
     </div>
 
@@ -67,6 +69,32 @@
         const sound = document.getElementById('sound');
         const startBtn = document.getElementById('startBtn');
         const stopBtn = document.getElementById('stopBtn');
+
+        // spacebar start/stop time
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                e.preventDefault();
+                if (isRunning) {
+                    stopTimer();
+                } else {
+                    startTimer();
+                }
+            }
+        });
+        // double q to reset all
+        let q = 0;
+        document.addEventListener('keydown', (e) => {
+            if(e.key === 'q' || e.key === 'Q') {
+                q++;
+                if (q === 2) {
+                    //reset all
+                    resetTimer();
+                    q = 0;
+                }
+            } else {
+                q = 0;
+            }
+        })
 
         function getActiveDisplay() {
             if (isBreak) {
@@ -188,6 +216,7 @@
         }
 
         updateDisplay(parseInt(workIn.value) * 60);
+
     </script>
 </body>
 </html>
