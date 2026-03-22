@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
     <title>IDWTLG</title>
 </head>
 <body>
@@ -28,18 +29,15 @@
                 <button onclick="setTimer(15, true)">15 min</button>
             </div>
         </div>
-        <div class="timer" style="font-size: 2rem; margin: 20px 0; color: chocolate;">
+        <div class="timer" style="font-size: 13rem;font-weight: bold;font-family: monospace; margin: 20px 0; color: chocolate;">
             <span id="workDisplay">25:00</span>
             <span id="breakDisplay" style="display: none;">05:00</span>
         </div>
         
-        <div class="buttons">
+        <div class="buttons" >
             <button id="startBtn" onclick="startTimer()">Start</button>
             <button style="background-color:#f44336; color: white;" id="stopBtn" onclick="stopTimer()" disabled>Stop</button>
             <button id="resetBtn" onclick="resetTimer()">Reset All</button>
-        </div>
-
-        <div>
             <button id="skipBtn" onclick="switchSession()">Skip Break</button>
         </div>
         <div style="text-align: left; margin: 20px; width: 300px; border: 1px solid black;">
