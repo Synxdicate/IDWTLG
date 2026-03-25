@@ -44,7 +44,8 @@
             <h4 style="text-align: center;">hotkey</h4>
             <p style="color: grey; margin-left: 5px;">
             > [spacebar] to start/stop time<br>
-            > [qq] to reset all
+            > [qq] to reset all<br>
+            > [s] to skip break<br>
             </p>
         </div>
 	<hr>
@@ -81,6 +82,13 @@
                 }
             }
         });
+        // s to skip break
+        document.addEventListener('keydown',(e)=>{
+            if(e.key ==='s' || e.key === 'S'){
+                switchSession();
+            }
+        })
+
         // double q to reset all
         let q = 0;
         document.addEventListener('keydown', (e) => {
