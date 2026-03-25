@@ -46,6 +46,8 @@
             > [spacebar] to start/stop time<br>
             > [qq] to reset all<br>
             > [s] to skip break<br>
+            > [z/x/c/v] to set work time<br>
+            > [b/n/m] to set break time<br>
             </p>
         </div>
 	<hr>
@@ -70,6 +72,34 @@
         const sound = document.getElementById('sound');
         const startBtn = document.getElementById('startBtn');
         const stopBtn = document.getElementById('stopBtn');
+
+        // hotkey for set time
+        document.addEventListener('keydown', (e) => {
+            if(e.key === 'z' || e.key === 'Z'){
+                setTimer(25, false);
+            } 
+            if(e.key === 'x' || e.key === 'X'){
+                setTimer(30, false);
+            } 
+            if(e.key === 'c' || e.key === 'C'){
+                setTimer(50, false);
+            } 
+            if(e.key === 'v' || e.key === 'V'){
+                setTimer(60, false);
+            }
+        });
+        // hotkey for set break time
+        document.addEventListener('keydown', (e) => {
+            if(e.key === 'b' || e.key === 'B'){
+                setTimer(5, true);
+            } 
+            if(e.key === 'n' || e.key === 'N'){
+                setTimer(10, true);
+            } 
+            if(e.key === 'm' || e.key === 'M'){
+                setTimer(15, true);
+            } 
+        });
 
         // spacebar start/stop time
         document.addEventListener('keydown', (e) => {
